@@ -880,6 +880,7 @@ jobs:
 
       - name: Create target read token
         id: target-read-token
+        if: ${{ secrets.CLAWSWEEPER_APP_ID != '' && secrets.CLAWSWEEPER_APP_PRIVATE_KEY != '' }}
         uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ secrets.CLAWSWEEPER_APP_ID }}
