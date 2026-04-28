@@ -61,8 +61,9 @@ Use `pnpm run check` before handoff for code/test/workflow changes.
 Useful live probes:
 
 ```bash
-gh run list --repo openclaw/clawsweeper --limit 20 --json databaseId,displayTitle,status,conclusion,createdAt,updatedAt
-gh api repos/openclaw/clawsweeper/readme --jq '.content' | base64 --decode
+REPORT_REPO="${CLAWSWEEPER_REPORT_REPO:-openclaw/clawsweeper}"
+gh run list --repo "$REPORT_REPO" --limit 20 --json databaseId,displayTitle,status,conclusion,createdAt,updatedAt
+gh api "repos/$REPORT_REPO/readme" --jq '.content' | base64 --decode
 gh api graphql -f query='query { repository(owner:"openclaw", name:"openclaw") { issues(states: OPEN) { totalCount } pullRequests(states: OPEN) { totalCount } } }'
 ```
 

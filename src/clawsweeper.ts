@@ -403,7 +403,7 @@ interface AuditResult {
 }
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const REPORT_REPO = "openclaw/clawsweeper";
+const REPORT_REPO = process.env.CLAWSWEEPER_REPORT_REPO?.trim() || "openclaw/clawsweeper";
 const RECORDS_ROOT = join(ROOT, "records");
 let activeRepositoryProfile = repositoryProfileFor(
   process.env.CLAWSWEEPER_TARGET_REPO ?? DEFAULT_TARGET_REPO,

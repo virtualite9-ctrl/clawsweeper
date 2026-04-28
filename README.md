@@ -467,7 +467,9 @@ dispatcher workflow in [docs/target-dispatcher.md](docs/target-dispatcher.md).
 The dispatcher sends `repository_dispatch` events to this repository with the
 target repo and exact item number; ClawSweeper then runs one event job that
 reviews, comments, and checks immediate safe apply instead of waiting for the
-next hot-intake cron or bulk publish lane.
+next hot-intake cron or bulk publish lane. Forks should also set
+`CLAWSWEEPER_REPORT_REPO=<owner>/<repo>` so generated report links point back to
+that fork instead of the upstream repository.
 
 ## Checks
 
@@ -488,16 +490,17 @@ Required secrets:
 - `CODEX_API_KEY`: optional compatibility alias for the same key during the login check.
 - `OPENCLAW_GH_TOKEN`: optional fallback GitHub token for read-heavy target scans and artifact publish reconciliation when the GitHub App token is unavailable.
 - `CLAWSWEEPER_APP_ID`: GitHub App ID for `openclaw-ci`. Currently `3306130`.
-- `CLAWSWEEPER_APP_PRIVATE_KEY`: private key for `openclaw-ci`; plan/review jobs use a short-lived GitHub App installation token for read-heavy target API calls, and apply/comment-sync jobs use the app token for comments and closes.
+- `CLAWSWEEPER_APP_PRIVATE_KEY`: private key for your GitHub App; plan/review jobs use a short-lived GitHub App installation token for read-heavy target API calls, and apply/comment-sync jobs use the app token for comments and closes.
   Keep App credentials scoped to the `actions/create-github-app-token` step.
   Review shards run Codex over attacker-controlled issue/PR text, so
   `codexEnv()` also strips these App variables before spawning Codex.
+- `CLAWSWEEPER_REPORT_REPO`: optional `<owner>/<repo>` override for generated dashboard/report links when running from a fork.
 
 Token flow:
 
 - Review shards log Codex in with `OPENAI_API_KEY`, then run without OpenAI or
   Codex token environment variables.
-- ClawSweeper uses the `openclaw-ci` GitHub App token for read-heavy target
+- ClawSweeper uses the configured GitHub App token for read-heavy target
   context, falling back to `OPENCLAW_GH_TOKEN` only if app secrets are absent.
 - Apply mode uses the app token for review comments and closes, so GitHub
   attributes mutations to `clawsweeper[bot]`.
@@ -507,5 +510,5 @@ Required app permissions:
 
 - read access for target scan context
 - write access to target repository issues and pull requests
-- optional Actions write on `openclaw/clawsweeper` for app-token-based run
+- optional Actions write on the ClawSweeper report repository for app-token-based run
   cancellation or dispatch
