@@ -30,6 +30,15 @@ const OPENCLAW_CLOSE_REASONS: readonly RepositoryCloseReason[] = [
   "stale_insufficient_info",
 ];
 
+const DISTILLER_CLOSE_REASONS: readonly RepositoryCloseReason[] = [
+  "implemented_on_main",
+  "cannot_reproduce",
+  "duplicate_or_superseded",
+  "not_actionable_in_repo",
+  "incoherent",
+  "stale_insufficient_info",
+];
+
 export const DEFAULT_TARGET_REPO = "openclaw/openclaw";
 
 export const REPOSITORY_PROFILES: readonly RepositoryProfile[] = [
@@ -58,6 +67,18 @@ export const REPOSITORY_PROFILES: readonly RepositoryProfile[] = [
     applyCloseRules: {
       issue: [],
       pull_request: ["implemented_on_main"],
+    },
+  },
+  {
+    targetRepo: "virtualite9-ctrl/distiller",
+    slug: "virtualite9-ctrl-distiller",
+    displayName: "Distiller",
+    checkoutDir: "distiller",
+    promptNote:
+      "Use the Distiller source tree, docs, and current main branch. Close proposals may use implemented-on-main, cannot-reproduce, duplicate, not-actionable-in-repo, incoherent, and stale-insufficient-info reasoning when the evidence is strong.",
+    applyCloseRules: {
+      issue: DISTILLER_CLOSE_REASONS,
+      pull_request: DISTILLER_CLOSE_REASONS.filter((reason) => reason !== "stale_insufficient_info"),
     },
   },
 ];
