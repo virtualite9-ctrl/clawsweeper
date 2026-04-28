@@ -552,6 +552,8 @@ pnpm run audit -- --target-repo openclaw/openclaw --max-pages 250 --sample-limit
 pnpm run reconcile -- --target-repo openclaw/openclaw --dry-run
 ```
 
+For a local OpenAI-compatible review-only setup, set `CLAWSWEEPER_REVIEW_BACKEND=local_openai` plus `CLAWSWEEPER_OPENAI_BASE_URL`, `CLAWSWEEPER_OPENAI_API_KEY`, and optionally `CLAWSWEEPER_OPENAI_MODEL`. This path is intended for local/manual review generation first; keep auto-close off until the model proves stable on your repo.
+
 Apply unchanged proposals later:
 
 ```bash

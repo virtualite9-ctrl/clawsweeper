@@ -27,6 +27,7 @@ import {
 type ItemKind = "issue" | "pull_request";
 type ApplyKind = ItemKind | "all";
 type DecisionKind = "close" | "keep_open";
+type ReviewBackend = "codex" | "local_openai";
 type CloseReason =
   | "implemented_on_main"
   | "cannot_reproduce"
@@ -177,6 +178,7 @@ interface Action {
 }
 
 interface ReviewRuntime {
+  backend?: ReviewBackend;
   model: string;
   reasoningEffort: string;
   sandboxMode?: string;
@@ -424,6 +426,8 @@ const AUDIT_HEALTH_END = "<!-- clawsweeper-audit:end -->";
 const DEFAULT_CODEX_MODEL = "gpt-5.5";
 const DEFAULT_REASONING_EFFORT = "high";
 const DEFAULT_SERVICE_TIER = "fast";
+const DEFAULT_LOCAL_OPENAI_BASE_URL = "http://127.0.0.1:1237/v1";
+const DEFAULT_LOCAL_OPENAI_API_KEY = "test";
 const REVIEW_POLICY_VERSION = "2026-04-27-policy-v8";
 const REVIEW_COMMENT_MARKER_PREFIX = "<!-- clawsweeper-review";
 const PROTECTED_LABELS = new Set(["security", "beta-blocker", "release-blocker", "maintainer"]);
@@ -888,6 +892,7 @@ function itemSnapshotHash(item: Item, context: ItemContext): string {
 }
 
 function reviewPolicyHash(options: {
+  backend?: ReviewBackend;
   model?: string;
   reasoningEffort?: string;
   sandboxMode?: string;
@@ -897,6 +902,7 @@ function reviewPolicyHash(options: {
     stableJson({
       version: REVIEW_POLICY_VERSION,
       freshDays: FRESH_DAYS,
+      backend: options.backend ?? "codex",
       model: options.model ?? DEFAULT_CODEX_MODEL,
       reasoningEffort: options.reasoningEffort ?? DEFAULT_REASONING_EFFORT,
       sandboxMode: options.sandboxMode ?? "read-only",
@@ -2474,6 +2480,54 @@ export function codexEnv(): NodeJS.ProcessEnv {
   return env;
 }
 
+function reviewBackendArg(value: string | boolean | string[] | undefined): ReviewBackend {
+  const backend = stringArg(value, process.env.CLAWSWEEPER_REVIEW_BACKEND || "codex").trim();
+  if (backend === "codex" || backend === "local_openai") return backend;
+  throw new Error(`Invalid review backend: ${backend}`);
+}
+
+function localOpenAIBaseUrl(): string {
+  return process.env.CLAWSWEEPER_OPENAI_BASE_URL?.trim() || DEFAULT_LOCAL_OPENAI_BASE_URL;
+}
+
+function localOpenAIApiKey(): string {
+  return process.env.CLAWSWEEPER_OPENAI_API_KEY?.trim() || DEFAULT_LOCAL_OPENAI_API_KEY;
+}
+
+async function discoverLocalOpenAIModel(baseUrl: string, apiKey: string): Promise<string> {
+  const response = await fetch(`${baseUrl.replace(/\/$/, "")}/models`, {
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`Local OpenAI model discovery failed: HTTP ${response.status}`);
+  }
+  const payload = (await response.json()) as { data?: { id?: string }[] };
+  const model = payload.data?.find((entry) => typeof entry.id === "string")?.id?.trim();
+  if (!model) throw new Error("Local OpenAI model discovery returned no model id");
+  return model;
+}
+
+async function resolveReviewModel(
+  backend: ReviewBackend,
+  explicitModel: string | undefined,
+): Promise<string> {
+  if (explicitModel?.trim()) return explicitModel.trim();
+  if (backend === "local_openai") {
+    const envModel = process.env.CLAWSWEEPER_OPENAI_MODEL?.trim();
+    if (envModel) return envModel;
+    return await discoverLocalOpenAIModel(localOpenAIBaseUrl(), localOpenAIApiKey());
+  }
+  return DEFAULT_CODEX_MODEL;
+}
+
+function stripJsonFence(text: string): string {
+  const trimmed = text.trim();
+  const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  return fenced?.[1]?.trim() || trimmed;
+}
+
 function openclawDirtyStatus(openclawDir: string): string {
   return run("git", ["status", "--porcelain=v1", "--untracked-files=all"], {
     cwd: openclawDir,
@@ -2594,6 +2648,120 @@ function runCodex(options: {
         .join("\n")}`,
     );
   }
+}
+
+async function runLocalOpenAIReview(options: {
+  item: Item;
+  context: ItemContext;
+  git: GitInfo;
+  model: string;
+  openclawDir: string;
+  reasoningEffort: string;
+  timeoutMs: number;
+  workDir: string;
+}): Promise<Decision> {
+  ensureDir(options.workDir);
+  const promptPath = join(options.workDir, `${options.item.number}.prompt.md`);
+  const outputPath = join(options.workDir, `${options.item.number}.json`);
+  writeFileSync(promptPath, promptFor(options.item, options.context, options.git), "utf8");
+  const dirtyBefore = openclawDirtyStatus(options.openclawDir);
+  if (dirtyBefore) {
+    throw new Error(
+      `Target checkout is dirty before reviewing #${options.item.number}:\n${dirtyBefore}`,
+    );
+  }
+  const baseUrl = localOpenAIBaseUrl().replace(/\/$/, "");
+  const apiKey = localOpenAIApiKey();
+  const schema = readFileSync(join(ROOT, "schema", "clawsweeper-decision.schema.json"), "utf8");
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), options.timeoutMs);
+  let content = "";
+  try {
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: options.model,
+        temperature: 0,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are ClawSweeper running in review-only local mode. Return only a JSON object that matches the requested schema.",
+          },
+          {
+            role: "user",
+            content:
+              `${readFileSync(promptPath, "utf8")}\n\nReturn JSON only. Schema:\n\n${schema}`,
+          },
+        ],
+      }),
+    });
+    if (!response.ok) {
+      throw new Error(`Local OpenAI request failed: HTTP ${response.status} ${response.statusText}`);
+    }
+    const payload = (await response.json()) as {
+      choices?: { message?: { content?: string | { text?: string }[] } }[];
+    };
+    const raw = payload.choices?.[0]?.message?.content;
+    content =
+      typeof raw === "string"
+        ? raw
+        : Array.isArray(raw)
+          ? raw
+              .map((entry) => (typeof entry?.text === "string" ? entry.text : ""))
+              .join("\n")
+          : "";
+    if (!content.trim()) throw new Error("Local OpenAI response did not include message content");
+    writeFileSync(outputPath, content, "utf8");
+  } finally {
+    clearTimeout(timeout);
+  }
+  const dirtyAfter = openclawDirtyStatus(options.openclawDir);
+  if (dirtyAfter) {
+    throw new Error(
+      `Local review dirtied the target checkout while reviewing #${options.item.number}:\n${dirtyAfter}`,
+    );
+  }
+  try {
+    return parseDecision(JSON.parse(stripJsonFence(content)));
+  } catch (error) {
+    const decision = codexFailureDecision(
+      null,
+      `Local OpenAI wrote invalid JSON or schema-invalid output to ${outputPath}: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      content,
+    );
+    throw new Error(
+      `Local OpenAI review wrote invalid JSON for #${options.item.number}: ${decision.evidence
+        .map((entry) => entry.detail)
+        .join("\n")}`,
+    );
+  }
+}
+
+async function runReviewModel(options: {
+  backend: ReviewBackend;
+  item: Item;
+  context: ItemContext;
+  git: GitInfo;
+  model: string;
+  openclawDir: string;
+  reasoningEffort: string;
+  sandboxMode: string;
+  serviceTier: string;
+  timeoutMs: number;
+  workDir: string;
+}): Promise<Decision> {
+  if (options.backend === "local_openai") {
+    return runLocalOpenAIReview(options);
+  }
+  return runCodex(options);
 }
 
 function closeReasonText(reason: CloseReason): string {
@@ -3431,6 +3599,7 @@ latest_release_sha: ${options.git.latestRelease?.sha ?? "unknown"}
 fixed_release: ${options.decision.fixedRelease ?? "unknown"}
 fixed_sha: ${options.decision.fixedSha ?? "unknown"}
 review_policy: ${options.reviewPolicy}
+review_backend: ${options.runtime.backend ?? "codex"}
 review_model: ${options.runtime.model}
 review_reasoning_effort: ${options.runtime.reasoningEffort}
 review_sandbox: ${options.runtime.sandboxMode ?? "unknown"}
@@ -3524,11 +3693,17 @@ function planCommand(args: Args): void {
   const itemNumbers = itemNumbersArg(args.item_numbers, args.item_number);
   const hasItemNumbersInput = typeof args.item_numbers === "string" && args.item_numbers.trim();
   const hotIntake = boolArg(args.hot_intake);
-  const model = stringArg(args.codex_model, DEFAULT_CODEX_MODEL);
+  const backend = reviewBackendArg(args.review_backend);
+  const model = stringArg(
+    args.codex_model,
+    backend === "local_openai"
+      ? process.env.CLAWSWEEPER_OPENAI_MODEL || "local-openai-auto"
+      : DEFAULT_CODEX_MODEL,
+  );
   const reasoningEffort = stringArg(args.codex_reasoning_effort, DEFAULT_REASONING_EFFORT);
   const sandboxMode = stringArg(args.codex_sandbox, "read-only");
   const serviceTier = stringArg(args.codex_service_tier, DEFAULT_SERVICE_TIER);
-  const reviewPolicy = reviewPolicyHash({ model, reasoningEffort, sandboxMode, serviceTier });
+  const reviewPolicy = reviewPolicyHash({ backend, model, reasoningEffort, sandboxMode, serviceTier });
   const planOptions: Parameters<typeof planCandidates>[0] = {
     batchSize,
     maxPages,
@@ -3555,7 +3730,7 @@ function planCommand(args: Args): void {
   );
 }
 
-function reviewCommand(args: Args): void {
+async function reviewCommand(args: Args): Promise<void> {
   const profile = repoFromArgs(args);
   const openclawDir = resolve(
     stringArg(args.target_dir, stringArg(args.openclaw_dir, `../${profile.checkoutDir}`)),
@@ -3564,7 +3739,13 @@ function reviewCommand(args: Args): void {
   const itemsDir = resolve(stringArg(args.items_dir, defaultItemsDir()));
   const batchSize = numberArg(args.batch_size, 5);
   const maxPages = numberArg(args.max_pages, 250);
-  const model = stringArg(args.codex_model, DEFAULT_CODEX_MODEL);
+  const backend = reviewBackendArg(args.review_backend);
+  const requestedModel = stringArg(
+    args.codex_model,
+    backend === "local_openai"
+      ? process.env.CLAWSWEEPER_OPENAI_MODEL || ""
+      : DEFAULT_CODEX_MODEL,
+  );
   const reasoningEffort = stringArg(args.codex_reasoning_effort, DEFAULT_REASONING_EFFORT);
   const sandboxMode = stringArg(args.codex_sandbox, "read-only");
   const serviceTier = stringArg(args.codex_service_tier, DEFAULT_SERVICE_TIER);
@@ -3584,8 +3765,9 @@ function reviewCommand(args: Args): void {
     console.error("[review] apply_closures is disabled; review shards are proposal-only");
   }
   ensureDir(artifactDir);
+  const model = await resolveReviewModel(backend, requestedModel);
   const git = gitInfo(openclawDir);
-  const reviewPolicy = reviewPolicyHash({ model, reasoningEffort, sandboxMode, serviceTier });
+  const reviewPolicy = reviewPolicyHash({ backend, model, reasoningEffort, sandboxMode, serviceTier });
   if (readonlyOpenclaw) makeTreeReadOnly(openclawDir);
   const selectionOptions: Parameters<typeof selectCandidates>[0] = {
     batchSize,
@@ -3615,7 +3797,8 @@ function reviewCommand(args: Args): void {
     const snapshotHash = itemSnapshotHash(item, context);
     let decision: Decision;
     try {
-      decision = runCodex({
+      decision = await runReviewModel({
+        backend,
         item,
         context,
         git,
@@ -3625,7 +3808,7 @@ function reviewCommand(args: Args): void {
         sandboxMode,
         serviceTier,
         timeoutMs,
-        workDir: join(artifactDir, "codex"),
+        workDir: join(artifactDir, backend === "local_openai" ? "local-openai" : "codex"),
       });
     } catch (error) {
       decision = codexFailureDecision(
@@ -3634,7 +3817,7 @@ function reviewCommand(args: Args): void {
         "Per-item Codex failure; continuing with the rest of the shard.",
       );
     }
-    const runtime = { model, reasoningEffort, sandboxMode, serviceTier };
+    const runtime = { backend, model, reasoningEffort, sandboxMode, serviceTier };
     const action = reviewActionForDecision({ item, decision, git, runtime });
     writeFileSync(
       join(artifactDir, reportFileName(item.repo, item.number)),
@@ -5165,11 +5348,11 @@ function checkCommand(): void {
   console.log("ok");
 }
 
-export function main(argv = process.argv.slice(2)): void {
+export async function main(argv = process.argv.slice(2)): Promise<void> {
   const args = parseArgs(argv);
   const command = args._[0] ?? "review";
   if (command === "plan") planCommand(args);
-  else if (command === "review") reviewCommand(args);
+  else if (command === "review") await reviewCommand(args);
   else if (command === "apply-artifacts") applyArtifactsCommand(args);
   else if (command === "apply-decisions") applyDecisionsCommand(args);
   else if (command === "audit") auditCommand(args);
@@ -5188,4 +5371,9 @@ export function main(argv = process.argv.slice(2)): void {
   }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  });
+}
