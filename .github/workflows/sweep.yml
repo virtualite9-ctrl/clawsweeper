@@ -878,15 +878,6 @@ jobs:
             echo "target_repo_name=$target_name"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Create target read token
-        id: target-read-token
-        if: ${{ secrets.CLAWSWEEPER_APP_ID != '' && secrets.CLAWSWEEPER_APP_PRIVATE_KEY != '' }}
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.CLAWSWEEPER_APP_ID }}
-          private-key: ${{ secrets.CLAWSWEEPER_APP_PRIVATE_KEY }}
-          owner: ${{ steps.target.outputs.target_repo_owner }}
-          repositories: ${{ steps.target.outputs.target_repo_name }}
 
       - uses: actions/setup-node@v4
         with:
