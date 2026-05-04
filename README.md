@@ -31,19 +31,19 @@ already implements the proposed change with source-backed evidence.
 
 ## Dashboard
 
-Last dashboard update: Apr 28, 2026, 08:06 UTC
+Last dashboard update: May 4, 2026, 00:00 UTC
 
 ### Fleet
 
 | Metric | Count |
 | --- | ---: |
 | Covered repositories | 3 |
-| Open issues | 4432 |
-| Open PRs | 3514 |
-| Open items total | 7946 |
+| Open issues | 3573 |
+| Open PRs | 3361 |
+| Open items total | 6934 |
 | Reviewed files | 7488 |
-| Unreviewed open items | 458 |
-| Due now by cadence | 3729 |
+| Unreviewed open items | 139 |
+| Due now by cadence | 6403 |
 | Proposed closes awaiting apply | 0 |
 | Closed by Codex apply | 10278 |
 | Failed or stale reviews | 35 |
@@ -53,8 +53,8 @@ Last dashboard update: Apr 28, 2026, 08:06 UTC
 
 | Repository | Open | Reviewed | Unreviewed | Due | Proposed closes | Closed | Latest review | Latest close | Comments synced, 1h |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | ---: |
-| [OpenClaw](https://github.com/openclaw/openclaw) | 7034 | 6583 | 451 | 3670 | 0 | 10275 | Apr 28, 2026, 07:51 UTC | Apr 28, 2026, 07:50 UTC | 141 |
-| [ClawHub](https://github.com/openclaw/clawhub) | 912 | 905 | 7 | 59 | 0 | 3 | Apr 28, 2026, 07:47 UTC | Apr 28, 2026, 05:18 UTC | 1 |
+| [OpenClaw](https://github.com/openclaw/openclaw) | 6700 | 6583 | 139 | 6210 | 0 | 10275 | Apr 28, 2026, 07:51 UTC | Apr 28, 2026, 07:50 UTC | 0 |
+| [ClawHub](https://github.com/openclaw/clawhub) | 234 | 905 | 0 | 193 | 0 | 3 | Apr 28, 2026, 07:47 UTC | Apr 28, 2026, 05:18 UTC | 0 |
 | [Distiller](https://github.com/virtualite9-ctrl/distiller) | 0 | 0 | 0 | 0 | 0 | 0 | unknown | unknown | 0 |
 
 ### Current Runs
@@ -63,7 +63,7 @@ Last dashboard update: Apr 28, 2026, 08:06 UTC
 | --- | --- | --- | --- |
 | [OpenClaw](https://github.com/openclaw/openclaw) | Event review applied | Apr 28, 2026, 07:53 UTC | [run](https://github.com/openclaw/clawsweeper/actions/runs/25040640691) |
 | [ClawHub](https://github.com/openclaw/clawhub) | Idle | unknown | _none_ |
-| [Distiller](https://github.com/virtualite9-ctrl/distiller) | Audit finished | Apr 28, 2026, 08:05 UTC | [run](https://github.com/virtualite9-ctrl/clawsweeper/actions/runs/25041344143) |
+| [Distiller](https://github.com/virtualite9-ctrl/distiller) | Audit finished | May 4, 2026, 00:00 UTC | [run](https://github.com/virtualite9-ctrl/clawsweeper/actions/runs/25294563354) |
 
 ### Fleet Activity
 
@@ -71,9 +71,9 @@ Latest review: Apr 28, 2026, 07:51 UTC. Latest close: Apr 28, 2026, 07:50 UTC. L
 
 | Window | Reviews | Close decisions | Keep-open decisions | Failed/stale reviews | Closed | Comments synced | Apply skips |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Last 15 minutes | 1 | 0 | 1 | 0 | 0 | 3 | 1 |
-| Last hour | 97 | 2 | 95 | 0 | 2 | 142 | 12 |
-| Last 24 hours | 3317 | 108 | 3209 | 16 | 60 | 2082 | 25 |
+| Last 15 minutes | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Last hour | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Last 24 hours | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 ### Recently Closed Across Repos
 
@@ -137,22 +137,22 @@ Run: [https://github.com/openclaw/clawsweeper/actions/runs/25040640691](https://
 | Metric | Count |
 | --- | ---: |
 | Target repository | [openclaw/openclaw](https://github.com/openclaw/openclaw) |
-| Open issues | 3558 |
-| Open PRs | 3476 |
-| Open items total | 7034 |
+| Open issues | 3352 |
+| Open PRs | 3348 |
+| Open items total | 6700 |
 | Reviewed files | 6583 |
-| Unreviewed open items | 451 |
+| Unreviewed open items | 139 |
 | Archived closed files | 13342 |
 
 #### Review Outcomes
 
 | Metric | Count |
 | --- | ---: |
-| Fresh reviewed issues in the last 7 days | 3355 |
+| Fresh reviewed issues in the last 7 days | 1224 |
 | Proposed issue closes | 0 (0% of reviewed issues) |
-| Fresh reviewed PRs in the last 7 days | 3193 |
+| Fresh reviewed PRs in the last 7 days | 1463 |
 | Proposed PR closes | 0 (0% of reviewed PRs) |
-| Fresh verified reviews in the last 7 days | 6548 |
+| Fresh verified reviews in the last 7 days | 2687 |
 | Proposed closes awaiting apply | 0 (0% of fresh reviews) |
 | Closed by Codex apply | 10275 |
 | Failed or stale reviews | 35 |
@@ -161,13 +161,13 @@ Run: [https://github.com/openclaw/clawsweeper/actions/runs/25040640691](https://
 
 | Metric | Coverage |
 | --- | ---: |
-| Hourly cadence coverage | 48/652 current (604 due, 7.4%) |
-| Hourly hot item cadence (<7d) | 48/652 current (604 due, 7.4%) |
-| Daily cadence coverage | 1476/4085 current (2609 due, 36.1%) |
-| Daily PR cadence | 1070/2827 current (1757 due, 37.8%) |
-| Daily new issue cadence (<30d) | 406/1258 current (852 due, 32.3%) |
-| Weekly older issue cadence | 1840/1846 current (6 due, 99.7%) |
-| Due now by cadence | 3670 |
+| Hourly cadence coverage | 0/91 current (91 due, 0%) |
+| Hourly hot item cadence (<7d) | 0/91 current (91 due, 0%) |
+| Daily cadence coverage | 0/4313 current (4313 due, 0%) |
+| Daily PR cadence | 0/3139 current (3139 due, 0%) |
+| Daily new issue cadence (<30d) | 0/1174 current (1174 due, 0%) |
+| Weekly older issue cadence | 512/2179 current (1667 due, 23.5%) |
+| Due now by cadence | 6210 |
 
 ### Audit Health
 
@@ -183,9 +183,9 @@ Latest review: Apr 28, 2026, 07:51 UTC. Latest close: Apr 28, 2026, 07:50 UTC. L
 
 | Window | Reviews | Close decisions | Keep-open decisions | Failed/stale reviews | Closed | Comments synced | Apply skips |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Last 15 minutes | 1 | 0 | 1 | 0 | 0 | 3 | 1 |
-| Last hour | 95 | 2 | 93 | 0 | 2 | 141 | 12 |
-| Last 24 hours | 2404 | 105 | 2299 | 16 | 57 | 1353 | 24 |
+| Last 15 minutes | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Last hour | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Last 24 hours | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 #### Recently Closed
 
@@ -243,11 +243,11 @@ No workflow status has been published yet.
 | Metric | Count |
 | --- | ---: |
 | Target repository | [openclaw/clawhub](https://github.com/openclaw/clawhub) |
-| Open issues | 874 |
-| Open PRs | 38 |
-| Open items total | 912 |
+| Open issues | 221 |
+| Open PRs | 13 |
+| Open items total | 234 |
 | Reviewed files | 905 |
-| Unreviewed open items | 7 |
+| Unreviewed open items | 0 |
 | Archived closed files | 8 |
 
 #### Review Outcomes
@@ -267,13 +267,13 @@ No workflow status has been published yet.
 
 | Metric | Coverage |
 | --- | ---: |
-| Hourly cadence coverage | 2/54 current (52 due, 3.7%) |
-| Hourly hot item cadence (<7d) | 2/54 current (52 due, 3.7%) |
-| Daily cadence coverage | 229/229 current (0 due, 100%) |
-| Daily PR cadence | 21/21 current (0 due, 100%) |
-| Daily new issue cadence (<30d) | 208/208 current (0 due, 100%) |
-| Weekly older issue cadence | 622/622 current (0 due, 100%) |
-| Due now by cadence | 59 |
+| Hourly cadence coverage | 0/21 current (21 due, 0%) |
+| Hourly hot item cadence (<7d) | 0/21 current (21 due, 0%) |
+| Daily cadence coverage | 0/172 current (172 due, 0%) |
+| Daily PR cadence | 0/13 current (13 due, 0%) |
+| Daily new issue cadence (<30d) | 0/159 current (159 due, 0%) |
+| Weekly older issue cadence | 703/703 current (0 due, 100%) |
+| Due now by cadence | 193 |
 
 ### Audit Health
 
@@ -288,8 +288,8 @@ Latest review: Apr 28, 2026, 07:47 UTC. Latest close: Apr 28, 2026, 05:18 UTC. L
 | Window | Reviews | Close decisions | Keep-open decisions | Failed/stale reviews | Closed | Comments synced | Apply skips |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Last 15 minutes | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Last hour | 2 | 0 | 2 | 0 | 0 | 1 | 0 |
-| Last 24 hours | 913 | 3 | 910 | 0 | 3 | 729 | 1 |
+| Last hour | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Last 24 hours | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 #### Recently Closed
 
@@ -328,12 +328,12 @@ Latest review: Apr 28, 2026, 07:47 UTC. Latest close: Apr 28, 2026, 05:18 UTC. L
 
 Repository: [virtualite9-ctrl/distiller](https://github.com/virtualite9-ctrl/distiller)
 
-Updated: Apr 28, 2026, 08:05 UTC
+Updated: May 4, 2026, 00:00 UTC
 
 State: Audit finished
 
 Refreshed README Audit Health from a full live virtualite9-ctrl/distiller state audit. Normal review/apply dashboard heartbeats preserve this block without rerunning the audit scan.
-Run: [https://github.com/virtualite9-ctrl/clawsweeper/actions/runs/25041344143](https://github.com/virtualite9-ctrl/clawsweeper/actions/runs/25041344143)
+Run: [https://github.com/virtualite9-ctrl/clawsweeper/actions/runs/25294563354](https://github.com/virtualite9-ctrl/clawsweeper/actions/runs/25294563354)
 <!-- clawsweeper-status:virtualite9-ctrl-distiller:end -->
 
 #### Queue
@@ -378,7 +378,7 @@ Run: [https://github.com/virtualite9-ctrl/clawsweeper/actions/runs/25041344143](
 <!-- clawsweeper-audit:virtualite9-ctrl-distiller:start -->
 Repository: [virtualite9-ctrl/distiller](https://github.com/virtualite9-ctrl/distiller)
 
-Last audit: Apr 28, 2026, 08:05 UTC
+Last audit: May 4, 2026, 00:00 UTC
 
 Status: **Passing**
 
