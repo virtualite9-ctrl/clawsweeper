@@ -31,19 +31,19 @@ already implements the proposed change with source-backed evidence.
 
 ## Dashboard
 
-Last dashboard update: May 4, 2026, 00:00 UTC
+Last dashboard update: May 4, 2026, 00:05 UTC
 
 ### Fleet
 
 | Metric | Count |
 | --- | ---: |
 | Covered repositories | 3 |
-| Open issues | 3573 |
-| Open PRs | 3361 |
-| Open items total | 6934 |
+| Open issues | 3572 |
+| Open PRs | 3360 |
+| Open items total | 6932 |
 | Reviewed files | 7488 |
-| Unreviewed open items | 139 |
-| Due now by cadence | 6403 |
+| Unreviewed open items | 138 |
+| Due now by cadence | 6402 |
 | Proposed closes awaiting apply | 0 |
 | Closed by Codex apply | 10278 |
 | Failed or stale reviews | 35 |
@@ -53,7 +53,7 @@ Last dashboard update: May 4, 2026, 00:00 UTC
 
 | Repository | Open | Reviewed | Unreviewed | Due | Proposed closes | Closed | Latest review | Latest close | Comments synced, 1h |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | ---: |
-| [OpenClaw](https://github.com/openclaw/openclaw) | 6700 | 6583 | 139 | 6210 | 0 | 10275 | Apr 28, 2026, 07:51 UTC | Apr 28, 2026, 07:50 UTC | 0 |
+| [OpenClaw](https://github.com/openclaw/openclaw) | 6698 | 6583 | 138 | 6209 | 0 | 10275 | Apr 28, 2026, 07:51 UTC | Apr 28, 2026, 07:50 UTC | 0 |
 | [ClawHub](https://github.com/openclaw/clawhub) | 234 | 905 | 0 | 193 | 0 | 3 | Apr 28, 2026, 07:47 UTC | Apr 28, 2026, 05:18 UTC | 0 |
 | [Distiller](https://github.com/virtualite9-ctrl/distiller) | 0 | 0 | 0 | 0 | 0 | 0 | unknown | unknown | 0 |
 
@@ -62,7 +62,7 @@ Last dashboard update: May 4, 2026, 00:00 UTC
 | Repository | State | Updated | Run |
 | --- | --- | --- | --- |
 | [OpenClaw](https://github.com/openclaw/openclaw) | Event review applied | Apr 28, 2026, 07:53 UTC | [run](https://github.com/openclaw/clawsweeper/actions/runs/25040640691) |
-| [ClawHub](https://github.com/openclaw/clawhub) | Idle | unknown | _none_ |
+| [ClawHub](https://github.com/openclaw/clawhub) | Audit finished | May 4, 2026, 00:05 UTC | [run](https://github.com/virtualite9-ctrl/clawsweeper/actions/runs/25294667220) |
 | [Distiller](https://github.com/virtualite9-ctrl/distiller) | Audit finished | May 4, 2026, 00:00 UTC | [run](https://github.com/virtualite9-ctrl/clawsweeper/actions/runs/25294563354) |
 
 ### Fleet Activity
@@ -137,11 +137,11 @@ Run: [https://github.com/openclaw/clawsweeper/actions/runs/25040640691](https://
 | Metric | Count |
 | --- | ---: |
 | Target repository | [openclaw/openclaw](https://github.com/openclaw/openclaw) |
-| Open issues | 3352 |
-| Open PRs | 3348 |
-| Open items total | 6700 |
+| Open issues | 3351 |
+| Open PRs | 3347 |
+| Open items total | 6698 |
 | Reviewed files | 6583 |
-| Unreviewed open items | 139 |
+| Unreviewed open items | 138 |
 | Archived closed files | 13342 |
 
 #### Review Outcomes
@@ -167,7 +167,7 @@ Run: [https://github.com/openclaw/clawsweeper/actions/runs/25040640691](https://
 | Daily PR cadence | 0/3139 current (3139 due, 0%) |
 | Daily new issue cadence (<30d) | 0/1174 current (1174 due, 0%) |
 | Weekly older issue cadence | 512/2179 current (1667 due, 23.5%) |
-| Due now by cadence | 6210 |
+| Due now by cadence | 6209 |
 
 ### Audit Health
 
@@ -231,11 +231,12 @@ Latest review: Apr 28, 2026, 07:51 UTC. Latest close: Apr 28, 2026, 07:50 UTC. L
 
 Repository: [openclaw/clawhub](https://github.com/openclaw/clawhub)
 
-Updated: unknown
+Updated: May 4, 2026, 00:05 UTC
 
-State: Idle
+State: Audit finished
 
-No workflow status has been published yet.
+Refreshed README Audit Health from a full live openclaw/clawhub state audit. Normal review/apply dashboard heartbeats preserve this block without rerunning the audit scan.
+Run: [https://github.com/virtualite9-ctrl/clawsweeper/actions/runs/25294667220](https://github.com/virtualite9-ctrl/clawsweeper/actions/runs/25294667220)
 <!-- clawsweeper-status:openclaw-clawhub:end -->
 
 #### Queue
@@ -278,7 +279,33 @@ No workflow status has been published yet.
 ### Audit Health
 
 <!-- clawsweeper-audit:openclaw-clawhub:start -->
-No audit has been published yet. Run `npm run audit -- --update-dashboard` to refresh this section.
+Repository: [openclaw/clawhub](https://github.com/openclaw/clawhub)
+
+Last audit: May 4, 2026, 00:05 UTC
+
+Status: **Action needed**
+
+Targeted review input: `1867,1883,1900,1912,1946,1947,1968,1973,1976`
+
+| Metric | Count |
+| --- | ---: |
+| Scan complete | yes |
+| Open items seen | 234 |
+| Missing eligible open records | 9 |
+| Missing maintainer-authored open records | 3 |
+| Missing protected open records | 6 |
+| Missing recently-created open records | 6 |
+| Archived records that are open again | 0 |
+| Stale item records | 695 |
+| Duplicate records | 0 |
+| Protected proposed closes | 0 |
+| Stale reviews | 0 |
+
+| Item | Category | Title | Detail |
+| --- | --- | --- | --- |
+| [#1867](https://github.com/openclaw/clawhub/pull/1867) | Missing eligible open | feat: Device Flow auth for headless environments | eligible |
+| [#1883](https://github.com/openclaw/clawhub/issues/1883) | Missing eligible open | The Skill Accumulation Problem: How many skills before your agent gets confused? | eligible |
+| [#1900](https://github.com/openclaw/clawhub/issues/1900) | Missing eligible open | accidently delete my account， cant create new one use github | eligible |
 <!-- clawsweeper-audit:openclaw-clawhub:end -->
 
 #### Latest Run Activity
